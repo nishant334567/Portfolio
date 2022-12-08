@@ -17,33 +17,27 @@ app.use(
   })
 );
 
-// app.use(express.static(path.join(__dirname, "client/build")));
-// app.get("*", (req, res) => {
-//   res.sendFile(path.join(__dirname, "client/build", "index.html"));
-// });
-
-// console.log(path.join(__dirname, "client/build"));
-
-/* mongoose.connect(urlCluster,{
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-  }) */
 const client = new MongoClient(process.env.MONGO_URL, {
   useNewUrlParser: true,
 });
 client.connect();
-// const db = mongoose.connection;
-// console.log(db);
-/*  db.on("error", console.error.bind(console, "connection error: "));
-  db.once("open", function () {
-    console.log("Connected successfully");
-  }); */
 
 app.get("/allsongs", async (req, res) => {
   const songs = await client.db("Portfolio").collection("Songs").find();
 
   const results = await songs.toArray();
   res.send(results);
+});
+
+app.get("/mymusic/:id", async (req, res) => {
+  var id = req.params.id;
+  var song = await client
+    .db("Portfolio")
+    .collection("Songs")
+    .find({ name: id });
+  song = await song.toArray();
+  // console.log(song[0]);
+  res.send(song[0]);
 });
 
 app.get("/mymusic/:id", async (req, res) => {
